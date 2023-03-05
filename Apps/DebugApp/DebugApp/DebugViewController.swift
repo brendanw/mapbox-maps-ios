@@ -18,38 +18,48 @@ final class DebugViewController: UIViewController {
     var markerView: UILabel!
     var pointAnnotationManager: PointAnnotationManager!
     var pointAnnotationList: [String: PointAnnotation] = [:]
+    var exits: [MapExit] = []
 
     // Location
     let locationManager = CLLocationManager()
-    var currCoords = CLLocationCoordinate2D(latitude: 38.6403634, longitude: -109.3445153)
-    var locationDragged: Bool?
+    var currCoords = CLLocationCoordinate2D(latitude: 40.7608, longitude: -111.8910)
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupMapboxMap()
+        setupFilterBtn()
 
+        // load exits
+        DispatchQueue.global(qos: .userInteractive).async {
+            let decoder = JSONDecoder()
+            let exits: [MapExit] = try! decoder.decode([MapExit].self, from: Data(exitJson.utf8))
+            DispatchQueue.main.sync { [weak self] in
+                self?.exits = exits
+                self?.showExits(exits)
+            }
+        }
     }
 
     private func setupMapboxMap() {
-        /*let styleURI = StyleURI(rawValue: "mapbox://styles/basebeta/cla1us0xn000314mob3xabfm2")!
+        let styleURI = StyleURI(rawValue: "mapbox://styles/basebeta/cla1us0xn000314mob3xabfm2")!
         let myMapInitOptions = MapInitOptions(
            styleURI: styleURI
-        )*/
+        )
 
         mapView = MapView(frame: view.bounds)
         guard let mapView = mapView else {
             return
         }
 
-        /*mapView.mapboxMap.loadStyleURI(styleURI) { [weak self] result in
+        mapView.mapboxMap.loadStyleURI(styleURI) { [weak self] result in
             self?.mapView!.location.options.activityType = .other
             let configuration = Puck2DConfiguration.makeDefault(showBearing: true)
             self?.mapView!.location.options.puckType = .puck2D(configuration)
             self?.mapView!.location.locationProvider.startUpdatingHeading()
             self?.mapView!.location.locationProvider.startUpdatingLocation()
-        }*/
+        }
 
         mapView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onMapTapped(_:))))
-        mapView.gestures.delegate = self
         mapView.translatesAutoresizingMaskIntoConstraints = false
         pointAnnotationManager = mapView.annotations.makePointAnnotationManager()
         pointAnnotationManager.delegate = self
@@ -60,6 +70,14 @@ final class DebugViewController: UIViewController {
             mapView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             mapView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor)])
+
+        let cameraOptions = CameraOptions(
+           center: CLLocationCoordinate2D(latitude: currCoords.latitude, longitude: currCoords.longitude),
+           zoom: CGFloat(5),
+           pitch: CGFloat(0)
+        )
+
+        mapView.mapboxMap.setCamera(to: cameraOptions)
     }
 
     @objc private func onMapTapped(_ sender: UITapGestureRecognizer) {
@@ -73,6 +91,55 @@ final class DebugViewController: UIViewController {
                 isMarkerOpen = false
             }
         }
+    }
+
+    private func showExits(_ exitList: [MapExit]) {
+        // print("show exits: \(exitList.count)")
+        pointAnnotationManager.annotations.removeAll()
+        pointAnnotationList.removeAll()
+
+        for exit in exitList {
+            let annotation = makeMapAnnotation(exitId: exit._id, name: exit.name, latitude: exit.latitude, longitude: exit.longitude)
+            pointAnnotationList[exit._id] = annotation
+            pointAnnotationManager.annotations.append(annotation)
+        }
+    }
+
+    private func makeMapAnnotation(exitId: String, name: String, latitude: Double, longitude: Double) -> PointAnnotation {
+        let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        var pointAnnotation = PointAnnotation(coordinate: coordinate)
+        let image = UIImage(named: "my-map-marker")!
+        pointAnnotation.image = .init(image: image, name: "location_pin")
+        pointAnnotation.userInfo = [
+            "exitId": exitId,
+            "exitName": name
+        ]
+        return pointAnnotation
+    }
+
+    private func setupFilterBtn() {
+        let filterButton = UIButton()
+        filterButton.setTitle("Simulate filter", for: .normal)
+        filterButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(filterButton)
+        filterButton.backgroundColor = .blue
+        filterButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -100).isActive = true
+        filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
+        filterButton.addTarget(self, action: #selector(filterClicked), for: .touchUpInside)
+    }
+
+    private var isFiltered = false
+    @objc private func filterClicked() {
+        if !isFiltered {
+            let filteredExits = exits.filter { exit in
+                Float.random(in: 0..<1) > 0.5
+            }
+            showExits(filteredExits)
+        } else {
+            showExits(exits)
+        }
+
+        isFiltered = !isFiltered
     }
 }
 
@@ -126,18 +193,9 @@ extension DebugViewController: AnnotationInteractionDelegate {
     }
 }
 
-extension DebugViewController: GestureManagerDelegate {
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didBegin gestureType: MapboxMaps.GestureType) {
-
-    }
-
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEnd gestureType: MapboxMaps.GestureType, willAnimate: Bool) {
-        if gestureType == GestureType.pan {
-            locationDragged = true
-        }
-    }
-
-    func gestureManager(_ gestureManager: MapboxMaps.GestureManager, didEndAnimatingFor gestureType: MapboxMaps.GestureType) {
-
-    }
+struct MapExit: Codable {
+    let _id: String
+    let name: String
+    let latitude: Double
+    let longitude: Double
 }
