@@ -94,7 +94,9 @@ final class DebugViewController: UIViewController {
     private func showExits(_ exitList: [MapExit]) {
         // print("show exits: \(exitList.count)")
         pointAnnotationList.removeAll()
-        mapView!.annotations.removeAnnotationManager(withId: pointAnnotationManager.id)
+        if pointAnnotationManager != nil {
+            mapView!.annotations.removeAnnotationManager(withId: pointAnnotationManager.id)
+        }
         pointAnnotationManager = mapView.annotations.makePointAnnotationManager()
         pointAnnotationManager.delegate = self
 
