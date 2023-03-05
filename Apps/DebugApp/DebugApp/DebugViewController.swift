@@ -61,8 +61,6 @@ final class DebugViewController: UIViewController {
 
         mapView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onMapTapped(_:))))
         mapView.translatesAutoresizingMaskIntoConstraints = false
-        pointAnnotationManager = mapView.annotations.makePointAnnotationManager()
-        pointAnnotationManager.delegate = self
 
         view.addSubview(mapView)
         NSLayoutConstraint.activate([
@@ -95,8 +93,10 @@ final class DebugViewController: UIViewController {
 
     private func showExits(_ exitList: [MapExit]) {
         // print("show exits: \(exitList.count)")
-        pointAnnotationManager.annotations.removeAll()
         pointAnnotationList.removeAll()
+        mapView!.annotations.removeAnnotationManager(withId: pointAnnotationManager.id)
+        pointAnnotationManager = mapView.annotations.makePointAnnotationManager()
+        pointAnnotationManager.delegate = self
 
         for exit in exitList {
             let annotation = makeMapAnnotation(exitId: exit._id, name: exit.name, latitude: exit.latitude, longitude: exit.longitude)
