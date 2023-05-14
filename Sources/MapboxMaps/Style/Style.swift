@@ -20,7 +20,7 @@ internal protocol StyleProtocol: AnyObject {
     func setSourceProperties(for sourceId: String, properties: [String: Any]) throws
     func updateGeoJSONSource(withId id: String, geoJSON: GeoJSONObject, dataId: String?) throws
 
-    //swiftlint:disable function_parameter_count
+    //swiftlint:disable:next function_parameter_count
     func addImage(_ image: UIImage,
                   id: String,
                   sdf: Bool,
@@ -175,7 +175,7 @@ public final class Style: StyleProtocol {
             switch value {
             case Optional<Any>.none where result.keys.contains(key):
                 result[key] = Style.layerPropertyDefaultValue(for: layer.type, property: key).value
-            // swiftlint:disable syntactic_sugar
+            // swiftlint:disable:next syntactic_sugar
             case Optional<Any>.some:
                 result[key] = value
             default: break
@@ -1006,6 +1006,15 @@ public final class Style: StyleProtocol {
     /// - Returns: Style atmosphere property value.
     public func atmosphereProperty(_ property: String) -> StylePropertyValue {
         return styleManager.getStyleAtmosphereProperty(forProperty: property)
+    }
+
+    // MARK: Model
+
+    /// :nodoc:
+    @_spi(Experimental) public func addStyleModel(modelId: String, modelUri: String) throws {
+        try handleExpected {
+            _styleManager.addStyleModel(forModelId: modelId, modelUri: modelUri)
+        }
     }
 
     // MARK: - Custom geometry

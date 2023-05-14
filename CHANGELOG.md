@@ -4,6 +4,45 @@ Mapbox welcomes participation and contributions from everyone.
 
 ## main
 
+* Add a renamed flag to `PuckBearingSource` and related APIs.
+
+## 10.13.1 - May 5, 2023
+
+* Remove XCFramework binary dependency on MapboxMobileEvents.
+* Update MapboxCoreMaps to 10.13.1 and MapboxCommon to 23.5.0
+* [CarPlay] Fix display link is not correctly paused/resumed when map is added to a CarPlay dashboard scene.
+
+## 10.13.0-rc.1 - April 19, 2023
+
+* Update MapboxCoreMaps to 10.13.0-rc.1 and MapboxCommon to 23.5.0-rc.1. 
+
+## 10.13.0-beta.1 - April 5, 2023
+
+* Remove unnecessary check before updating a geo json source.
+* Enable zoom during a drag gesture.
+* Fix bearing value is fluctuating between initial value and correct value during a rotation gesture.
+* Allows animation during any ongoing gestures.
+* Sync map size to the size of the metal view.
+* Fix visual jitter when an annotation dragging ends.
+* Fix missing feature properties for `nil`/`null` values.
+* Added experimental `tileCover` method to `MapboxMap` that returns tile ids covering the map.
+* Update MapboxCoreMaps to 10.13.0-beta.1 and MapboxCommon to 23.5.0-beta.1.
+
+## 10.12.1 - March 29, 2023
+
+* Bump MapboxCoreMaps to 10.12.1
+
+## 10.12.0 - March 22, 2023
+
+* Deprecate `Snapshotter.tileMode`.
+* Bump MapboxCoreMaps to 10.12.0 and MapboxCommon to 23.4.0
+
+## 10.12.0-rc.1 - March 8, 2023
+
+* Correct user-agent fragment sent to events/telemetry service.
+* Bump MapboxCoreMaps to 10.12.0-rc.1 and MapboxCommon to 23.4.0-rc.1.
+* Change annotation end-of-drag delay to 0.125 to minimize lagging.
+
 ## 10.12.0-beta.1 - February 22, 2023
 
 * Added basic signposts for performance profiling. To enable them, use `MAPBOX_MAPS_SIGNPOSTS_ENABLED` environment variable. ([#1818](https://github.com/mapbox/mapbox-maps-ios/pull/1818))
@@ -11,6 +50,7 @@ Mapbox welcomes participation and contributions from everyone.
 * Update MapboxCoreMaps to `v10.12.0-beta.1` and MapboxCommon to `v23.4.0-beta.1`
 * Fix app extension support. ([#1916](https://github.com/mapbox/mapbox-maps-ios/pull/1916))
 * Allow pass `dataId` to `sourceDataLoaded` event.
+* Add a dedicated GestureRecognizer (and Handler) to interrupt deceleration animation on tap on the map.
 
 ## 10.11.0 - February 8, 2023
 * Update to MapboxCoreMaps 10.11.1 and MapboxCommon 23.3.1. ([#1899](https://github.com/mapbox/mapbox-maps-ios/pull/1899))

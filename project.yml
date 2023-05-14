@@ -6,7 +6,6 @@ configFiles:
 options:
   defaultConfig: Release
   parallelizeBuild: false
-  xcodeVersion: "1300"
 packages:
   MapboxMaps:
     path: ./
@@ -51,6 +50,7 @@ targets:
       - path: "Tests/MapboxMapsTests"
         excludes:
           - "Integration Tests/HTTP/HTTPIntegrationTests.swift"
+          - "MigrationGuide/MigrationGuideIntegrationTests.swift"
     dependencies:
       - target: MapboxTestHost
     postBuildScripts:
